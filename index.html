@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1326">
+<title>王重生計時器 v17</title>
+<style>
+:root{--bg:#0b1326;--surface:#111f37;--surface2:#172842;--line:#2c415d;--fg:#f5f8ff;--dim:#abc0d5;--primary:#60d1ed;--gold:#f6cb68;--ok:#75db9d;--red:#f29ba9}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--fg);background:var(--bg);font-family:system-ui,-apple-system,'Microsoft JhengHei','Noto Sans TC',sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.topbar{padding:21px 24px 16px;border-bottom:1px solid var(--line);background:#0f1c31}.heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.heading h1{font-size:25px;margin:0;font-weight:820;letter-spacing:.02em}.version{color:var(--dim);font-size:12px}.subtitle{color:var(--dim);font-size:13px;margin:7px 0 17px}.boss-tabs,.tools,.filter-row{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.tools{margin-top:12px}.btn{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--surface2);color:var(--fg);font-weight:650;min-height:41px}.btn:hover:not(:disabled){border-color:var(--primary);filter:brightness(1.09)}.btn.active,.btn.primary{background:var(--primary);border-color:var(--primary);color:#071b2b}.btn.danger{border-color:#784555;color:#ffd0da;background:#352031}.btn:disabled{opacity:.45;cursor:default}.btn.small{padding:7px 9px;font-size:12px;min-height:34px}.btn.wide{width:100%}.btn.ghost{background:transparent}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 390px;align-items:start;min-height:calc(100vh - 200px)}.channels-panel{padding:20px 24px 40px;min-width:0}.sidebar{border-left:1px solid var(--line);padding:20px 18px 40px;background:#0d1a2e;position:sticky;top:0;height:calc(100vh - 0px);min-height:660px;overflow:auto;scrollbar-color:#435675 transparent}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.section-title h2{margin:0;font-size:19px}.hint{color:var(--dim);font-size:12px;line-height:1.55;margin:2px 0 12px}.filter-row{margin-bottom:16px}.filter-row input{width:120px;padding:10px 12px;border:1px solid var(--line);background:var(--surface);border-radius:9px;color:var(--fg)}.filter-row label{font-size:13px;color:var(--dim);display:flex;align-items:center;gap:5px}
+.channel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}.channel{border:1px solid var(--line);background:var(--surface);border-radius:13px;padding:13px;min-height:137px;display:flex;flex-direction:column;gap:9px}.channel.running{border-color:#3a9bb5}.channel.possible{border-color:#b18c3c}.channel.ready{border-color:#3e9e68}.channel-head{display:flex;align-items:center;justify-content:space-between;gap:4px}.channel-head b{font-size:18px;white-space:nowrap}.status{font-size:11px;color:var(--dim);border-radius:8px;padding:4px 7px;background:#202f46;white-space:nowrap}.running .status{color:#9fe9ff}.possible .status{color:#ffe3a1}.ready .status{color:#a3ffbf}.channel-body{min-height:48px;font-size:14px;line-height:1.55}.channel-body small{display:block;font-size:11px;color:var(--dim)}.channel-actions{display:flex;gap:7px;margin-top:auto}.channel-actions .btn{flex:1;font-size:12px;padding:7px;min-width:0;min-height:35px}.kill{color:#c4f5b5}.pending-pill{font-size:11px;padding:2px 5px;background:#4d3419;border-radius:6px;color:#ffdd98;margin-top:4px;display:inline-block}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:12px}.stat{border:1px solid var(--line);background:var(--surface);border-radius:10px;text-align:center;padding:9px 3px}.stat b{display:block;font-size:19px}.stat span{font-size:11px;color:var(--dim)}.queue-list{display:flex;flex-direction:column;gap:8px}.queue-item{border:1px solid var(--line);padding:11px;border-radius:11px;background:var(--surface)}.queue-top{display:flex;justify-content:space-between;gap:8px;font-weight:740;font-size:13px}.queue-time{font-size:14px;margin:4px 0}.queue-detail{font-size:11px;color:var(--dim)}.text-gold{color:var(--gold)}.text-ok{color:var(--ok)}.empty{font-size:13px;color:var(--dim);padding:12px 4px}.sidebar-section{border-top:1px solid var(--line);margin-top:20px;padding-top:17px}.sidebar-section h2{font-size:19px;margin:0 0 5px}.pending-form{display:flex;gap:7px}.pending-form select{min-width:0;flex:1}.select{background:var(--surface2);border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:10px;min-height:42px}.pending-info{margin:9px 0 11px;color:var(--gold);font-size:12px}.metric-group{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.metric{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px}.metric b{font-size:19px;display:block;margin-bottom:3px}.metric span{color:var(--dim);font-size:12px}.insight{margin:12px 0;font-size:13px;color:var(--dim);line-height:1.65}.insight strong{color:var(--fg)}.loot-counts{max-height:245px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}.loot-count{display:flex;justify-content:space-between;gap:8px;background:var(--surface);border:1px solid var(--line);padding:8px 9px;border-radius:8px;font-size:12px}.loot-count b{white-space:nowrap}.minor-heading{font-size:14px;font-weight:740;margin:16px 0 9px}.loot-history{display:flex;flex-direction:column;gap:9px;max-height:460px;overflow:auto}.history-item{border:1px solid var(--line);background:var(--surface);padding:10px;border-radius:10px}.history-item .row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}.history-item p{font-size:12px;line-height:1.5;margin:7px 0;color:var(--fg);overflow-wrap:anywhere}.history-actions{display:flex;gap:5px}.footer-actions{display:flex;flex-wrap:wrap;gap:7px;margin:13px 0}.footer-actions>*{flex:1}.muted{color:var(--dim)}
+.dialog-backdrop{display:none;position:fixed;inset:0;padding:12px;background:rgba(2,7,16,.78);align-items:center;justify-content:center;z-index:100}.dialog-backdrop.open{display:flex}.dialog{width:min(680px,100%);max-height:calc(100dvh - 24px);overflow-y:auto;background:#14233c;border:1px solid #3a536c;border-radius:16px;padding:18px;box-shadow:0 18px 60px #0008}.dialog h2{margin:0 0 9px;font-size:21px}.dialog p{font-size:13px;color:var(--dim);margin:0 0 12px}.dialog-controls{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;margin-top:14px}.loot-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:48dvh;overflow:auto;padding:2px}.option-head{grid-column:1/-1;font-size:14px;font-weight:780;padding:8px 0 1px}.option{display:flex;align-items:center;gap:7px;border:1px solid var(--line);padding:8px;border-radius:9px;background:var(--surface);min-width:0;font-size:12px}.option[hidden]{display:none}.option span{flex:1}.option input[type=number]{width:51px;min-width:51px;border:1px solid var(--line);background:#0d1a2e;border-radius:6px;color:var(--fg);padding:5px;text-align:center}.option input:disabled{opacity:.4}.loot-search,.share-text{width:100%;background:#0d1a2e;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:10px}.loot-search{margin:3px 0 8px}.share-text{min-height:245px;resize:vertical;font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:1.6}.mobile-nav{display:none}.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 16px;background:#29566a;color:white;border-radius:10px;box-shadow:0 7px 30px #0008;z-index:120;display:none;max-width:90%;font-size:13px}.toast.visible{display:block}
+@media(max-width:950px){.workspace{grid-template-columns:1fr}.sidebar{height:auto;min-height:0;position:static;border-left:0;border-top:1px solid var(--line)}.workspace:not(.show-sidebar) .sidebar{display:none}.workspace.show-sidebar .channels-panel{display:none}.topbar{padding:16px 14px}.channels-panel,.sidebar{padding:16px 13px 92px}.mobile-nav{display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:60;background:#111f37;padding:9px 14px calc(9px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}.mobile-nav .btn{flex:1}.sidebar-section{margin-top:17px}.toast{bottom:90px}.heading h1{font-size:22px}}
+@media(max-width:520px){.channel-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.channel{padding:10px;min-height:132px}.channel-head b{font-size:15px}.status{font-size:10px;padding:3px 5px}.channel-body{font-size:12px}.channel-body small{font-size:10px}.boss-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.boss-tabs .btn{padding:10px 2px;font-size:13px}.tools .btn{padding:9px 8px;font-size:12px;flex:1}.pending-form{flex-wrap:wrap}.pending-form .btn{width:100%}.loot-options{grid-template-columns:1fr}}
+[hidden]{display:none!important}
+.side-tab-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:17px;padding:5px;background:#142640;border:1px solid var(--line);border-radius:12px}
+.side-tab{min-width:0;padding:11px 5px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--dim);font-size:13px;font-weight:760;white-space:nowrap;cursor:pointer}
+.side-tab.active{background:var(--primary);border-color:var(--primary);color:#071b2b}
+.side-tab:disabled{opacity:.43;cursor:not-allowed}
+.tab-count{font-size:11px;background:#f3c969;color:#281c05;padding:1px 5px;border-radius:999px;margin-left:2px}
+.side-tab.active .tab-count{background:#133b50;color:#eaffff}
+.loot-switch-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:11px;cursor:pointer;margin:12px 0}
+.loot-switch-row strong{display:block;font-size:14px}
+.loot-switch-row small{display:block;margin-top:3px;color:var(--dim);font-size:11px;line-height:1.45}
+.loot-switch-row input{position:absolute;opacity:0;width:1px;height:1px}
+.switch-track{width:46px;height:26px;min-width:46px;display:flex;align-items:center;padding:3px;background:#465670;border-radius:20px;transition:background .15s}
+.switch-knob{width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 5px #0005}
+.loot-switch-row input:checked+.switch-track{background:#27a86c}
+.loot-switch-row input:checked+.switch-track .switch-knob{transform:translateX(20px)}
+.loot-switch-row:has(input:focus-visible){outline:2px solid var(--primary);outline-offset:2px}
+.loot-off-note{font-size:12px;line-height:1.7;color:#dbeaff;border:1px solid #3e5d79;background:#172c44;border-radius:10px;padding:12px;margin:10px 0 15px}
+@media(max-width:520px){.side-tab{font-size:12px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+ <div class="heading"><h1>王重生計時器 <span class="version">v17</span></h1><span class="version">60 頻道・自由切換戰利品紀錄</span></div>
+ <p class="subtitle">「開始計時」只記錄時間；按「擊殺」才會增加擊殺數並重啟倒數。</p>
+ <div class="boss-tabs" id="bossTabs">
+  <button class="btn active" data-boss="mushroom">🍄 蘑菇王</button>
+  <button class="btn" data-boss="croc">🐊 鱷魚王</button>
+  <button class="btn" data-boss="snowman">☃️ 雪毛怪人</button>
+ </div>
+ <div class="tools">
+  <button class="btn" id="exportTimers">複製重生時間</button>
+  <button class="btn" id="importTimers">匯入時間</button>
+  <button class="btn danger" id="clearBoss">清除此王計時</button>
+  <button class="btn danger" id="clearAll">清除全部計時</button>
+ </div>
+</header>
+<div class="workspace" id="workspace">
+ <main class="channels-panel" id="channelsPanel">
+  <div class="section-title"><h2 id="channelsTitle">🍄 蘑菇王</h2><span class="hint" id="spawnHint"></span></div>
+  <div class="filter-row"><input id="channelSearch" inputmode="numeric" maxlength="2" placeholder="搜尋頻道 1~60" aria-label="搜尋頻道"><label><input id="activeOnly" type="checkbox">只看有計時</label><span id="displayCount" class="hint"></span></div>
+  <div class="channel-grid" id="channelGrid"></div>
+ </main>
+ <aside class="sidebar" id="sidebar">
+  <div class="side-tab-bar" role="tablist" aria-label="右側資訊分頁">
+   <button class="side-tab active" role="tab" id="tabRespawn" aria-selected="true" aria-controls="respawnPane" data-side-tab="respawn">⏱ 王重生時間</button>
+   <button class="side-tab" role="tab" id="tabLoot" aria-selected="false" aria-controls="lootPane" data-side-tab="loot">🎁 戰利品紀錄 <span id="tabPendingCount" class="tab-count" hidden></span></button>
+  </div>
+  <p id="lootOnlyNote" class="hint" style="margin:7px 0 13px" hidden>戰利品紀錄目前僅支援雪毛怪人。</p>
+  <div id="respawnPane" role="tabpanel" aria-labelledby="tabRespawn">
+  <h2 style="margin:0 0 5px;font-size:19px">下一隻王</h2><p class="hint">僅顯示目前王，依最早可能重生時間排序（最多 10 筆）</p>
+  <div class="stats"><div class="stat"><b id="runningCount">0</b><span>倒數中</span></div><div class="stat"><b id="possibleCount">0</b><span>可能重生</span></div><div class="stat"><b id="readyCount">0</b><span>已到時間</span></div></div>
+  <div class="queue-list" id="queueList"></div>
+  <section class="sidebar-section"><h2>打王記數</h2><p class="hint">只有按「擊殺」會 +1，不含「開始計時」</p><div class="stat"><b id="killCount">0</b><span id="killLabel">🍄 蘑菇王擊殺數</span></div><button class="btn danger wide" id="resetKills" style="margin-top:9px">重置目前王擊殺數</button></section>
+  </div>
+  <div id="lootPane" role="tabpanel" aria-labelledby="tabLoot" hidden>
+  <section id="lootPanel">
+   <div class="section-title"><h2 style="margin:0">☃️ 雪毛怪人戰利品</h2></div>
+   <label class="loot-switch-row" for="lootEnabled">
+    <span><strong>啟用戰利品紀錄</strong><small id="lootSwitchHint">開啟後，擊殺會加入待登記清單</small></span>
+    <input id="lootEnabled" type="checkbox" role="switch" aria-label="啟用戰利品紀錄">
+    <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+   </label>
+   <p id="lootDisabledNote" class="loot-off-note" hidden>目前為「只記擊殺」模式。按「擊殺」仍會 +1 並重新計時，不會產生戰利品待記錄項目。先前已儲存的戰利品仍可在下方查看。</p>
+   <div id="lootEntryForm">
+    <p class="hint" style="margin-top:10px">擊殺後才會進入待登記清單；儲存後自動移除。</p>
+    <div class="pending-form"><select class="select" id="lootChannelSelect" aria-label="待記錄戰利品的頻道"><option value="">選擇頻道</option></select><button class="btn primary" id="openLoot">記錄戰利品</button></div>
+    <p class="pending-info" id="pendingInfo">待登記：0 筆</p>
+   </div>
+   <div class="metric-group"><div class="metric"><b id="loggedRuns">0</b><span>已完成戰利品紀錄</span></div><div class="metric"><b id="pendingRuns">0</b><span>待記錄</span></div><div class="metric"><b id="equipmentCount">0</b><span>裝備件數</span></div><div class="metric"><b id="scrollCount">0</b><span>卷軸張數</span></div></div>
+   <div class="insight" id="lootInsights"></div>
+   <div class="minor-heading">累計掉落明細</div><div class="loot-counts" id="lootCounts"></div>
+   <div class="minor-heading">戰利品歷史 <span class="muted" id="historyCount"></span></div><div class="loot-history" id="lootHistory"></div>
+   <button class="btn small wide ghost" id="showMoreHistory" style="margin-top:9px" hidden>顯示全部紀錄</button>
+   <div class="footer-actions"><button class="btn small" id="exportLootText">複製統計</button><button class="btn small" id="exportLootCSV">匯出 CSV</button></div>
+   <button class="btn danger wide small" id="clearLoot">清除全部戰利品紀錄</button>
+  </section>
+  </div>
+ </aside>
+</div>
+<nav class="mobile-nav" aria-label="手機檢視切換"><button class="btn primary" id="mobileChannels">60 頻道</button><button class="btn" id="mobileStats">右側資訊 <span id="mobilePending"></span></button></nav>
+<div class="dialog-backdrop" id="lootBackdrop" role="presentation"><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="lootTitle"><h2 id="lootTitle">記錄戰利品</h2><p id="lootDialogHelp">選擇本次掉落的裝備或卷軸，可調整同品項數量。</p><input class="loot-search" type="search" id="lootSearch" placeholder="搜尋裝備／卷軸名稱"><div id="lootOptions" class="loot-options"></div><div class="dialog-controls"><button class="btn danger" id="noLoot">無值得記錄掉落</button><button class="btn" id="cancelLoot">取消</button><button class="btn primary" id="saveLoot">儲存</button></div></section></div>
+<div class="dialog-backdrop" id="textBackdrop" role="presentation"><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="textTitle"><h2 id="textTitle">分享資料</h2><p id="textHelp">複製以下文字即可分享。</p><textarea id="shareText" class="share-text" spellcheck="false"></textarea><div class="dialog-controls"><button class="btn" id="cancelText">取消</button><button class="btn primary" id="confirmText">複製文字</button></div></section></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+'use strict';
+const CHANNEL_COUNT=60, QUEUE_LIMIT=10;
+const BOSSES={
+ mushroom:{name:'蘑菇王',icon:'🍄',minMinutes:42,maxMinutes:65},
+ croc:{name:'鱷魚王',icon:'🐊',minMinutes:45,maxMinutes:45},
+ snowman:{name:'雪毛怪人',icon:'☃️',minMinutes:45,maxMinutes:68}
+};
+const SNOWMAN_LOOT={
+ equipment:['天空滑雪板','玫瑰耳環','格洛斧','佛羅利刃','雙利刃斧','鐳奧丁錘','毀滅之鎚','飛翔斧','雙手鐳劍','坲羅劍','金圓盾','梅杜斯','紅可撒之弩','怒濤之杖','卡帝斯拳套','霸傑之刃','吸血鬼之爪','調停者'],
+ scrolls:['長杖魔力卷軸10%','眼飾幸運卷軸10%','眼飾敏捷卷軸10%','指虎攻擊卷軸10%','短杖魔力卷軸10%','短劍攻擊卷軸10%','披風智力卷軸10%','披風生命卷軸10%','盾牌防禦卷軸60%','盾牌生命卷軸60%','長杖魔力卷軸60%','短杖魔力卷軸60%','披風智力卷軸60%','披風魔防卷軸60%','手套攻擊卷軸60%','手套敏捷卷軸60%','鞋子敏捷卷軸60%','套服敏捷卷軸60%','褲/裙防禦卷軸60%']
+};
+const $=id=>document.getElementById(id);
+let currentBoss='mushroom', sidebarTab='respawn', modalMode='new', modalChannel=null, editingRecordId=null, showAllLoot=false, textMode='export';
+function htmlSafe(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function pad(n){return String(n).padStart(2,'0');}
+function formatClock(t){return new Date(t).toLocaleTimeString('zh-TW',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function formatDate(t){let d=new Date(t);return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;}
+function formatDuration(ms){const n=Math.max(0,Math.ceil(ms/1000));const h=Math.floor(n/3600),m=Math.floor(n%3600/60),s=n%60;return (h?`${pad(h)}:`:'')+`${pad(m)}:${pad(s)}`;}
+function ago(t){const m=Math.max(0,Math.floor((Date.now()-t)/60000));if(m<1)return '剛剛';if(m<60)return `${m} 分鐘前`;return `${Math.floor(m/60)} 小時 ${m%60} 分鐘前`;}
+function randomId(){return 'l'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10);}
+function toast(message){const t=$('toast');t.textContent=message;t.classList.add('visible');clearTimeout(toast._timer);toast._timer=setTimeout(()=>t.classList.remove('visible'),3000);}
+function safeReadJSON(key,fallback){try{const obj=JSON.parse(localStorage.getItem(key));return obj===null?fallback:obj;}catch(_){return fallback;}}
+function timerKey(b,ch){return `bossTimer:v2:${b}:${ch}`;} // 沿用 v15 的計時資料
+function getStart(b,ch){const n=Number(localStorage.getItem(timerKey(b,ch)));return Number.isFinite(n)&&n>0?n:null;}
+function setStart(b,ch,t=Date.now()){localStorage.setItem(timerKey(b,ch),String(t));}
+function deleteStart(b,ch){localStorage.removeItem(timerKey(b,ch));}
+function killKey(b){return `bossTimer:v6:kills:${b}`;} // 沿用 v15 的擊殺統計
+function getKills(b){const n=Number(localStorage.getItem(killKey(b))||0);return Number.isFinite(n)?n:0;}
+function incrementKills(b){localStorage.setItem(killKey(b),String(getKills(b)+1));}
+function spawnAt(b,start){const boss=BOSSES[b];return {min:start+boss.minMinutes*60000,max:start+boss.maxMinutes*60000};}
+function statusFor(b,start,now=Date.now()){if(!start)return 'idle';const {min,max}=spawnAt(b,start);if(now>=max)return 'ready';if(now>=min)return 'possible';return 'running';}
+
+const PENDING_KEY='bossTimer:v16:snowmanPendingLoot';
+const LEGACY_PENDING_KEY='bossTimer:v15:snowmanPendingLoot';
+const LOOT_KEY='bossTimer:v12:snowmanLoot';
+const LOOT_ENABLED_KEY='bossTimer:v17:lootEnabled';
+function lootEnabled(){
+ const value=localStorage.getItem(LOOT_ENABLED_KEY);
+ if(value==='1')return true;
+ if(value==='0')return false;
+ // 升級舊版：已有戰利品或待登記的人預設維持開啟；全新使用者預設關閉。
+ const enabled=getPending().length>0||getRecords().length>0;
+ localStorage.setItem(LOOT_ENABLED_KEY,enabled?'1':'0');
+ return enabled;
+}
+function setLootEnabled(enabled){
+ if(!enabled){
+  const pending=getPending();
+  if(pending.length&&!confirm(`目前有 ${pending.length} 筆尚未完成的戰利品紀錄。\n關閉功能會放棄這些待登記項目（已儲存的戰利品、擊殺數及倒數不受影響）。確定關閉嗎？`)){
+   $('lootEnabled').checked=true;
+   return;
+  }
+  clearPending();
+ }
+ localStorage.setItem(LOOT_ENABLED_KEY,enabled?'1':'0');
+ renderAll();
+ toast(enabled?'已啟用戰利品紀錄':'已關閉戰利品紀錄，擊殺仍正常計數');
+}
+
+function getPending(){
+ const saved=safeReadJSON(PENDING_KEY,null);
+ if(Array.isArray(saved))return saved.filter(x=>x&&Number.isInteger(x.channel)&&x.channel>=1&&x.channel<=60&&Number.isFinite(x.killedAt));
+ const legacy=safeReadJSON(LEGACY_PENDING_KEY,[]);
+ const migrated=Array.isArray(legacy)?[...new Set(legacy.map(Number))].filter(ch=>Number.isInteger(ch)&&ch>=1&&ch<=60).map(ch=>({channel:ch,killedAt:getStart('snowman',ch)||Date.now()})):[];
+ localStorage.setItem(PENDING_KEY,JSON.stringify(migrated));return migrated;
+}
+function savePending(rows){localStorage.setItem(PENDING_KEY,JSON.stringify(rows));}
+function hasPending(ch){return getPending().some(x=>x.channel===ch);}
+function addPending(ch,t){const rows=getPending();if(rows.some(x=>x.channel===ch))return false;rows.push({channel:ch,killedAt:t});savePending(rows);return true;}
+function removePending(ch){savePending(getPending().filter(x=>x.channel!==ch));}
+function clearPending(){savePending([]);}
+function getRecords(){
+ const original=safeReadJSON(LOOT_KEY,[]);
+ if(!Array.isArray(original))return [];
+ let changed=false;
+ const rows=original.filter(x=>x&&typeof x==='object').map((r,i)=>{
+  if(!r.id){r.id=`legacy_${Number(r.recordedAt)||0}_${i}`;changed=true;}
+  if(!Array.isArray(r.items)){r.items=[];changed=true;}
+  r.items=r.items.map(x=>{
+    const q=Number(x.quantity||1);
+    if(x.quantity===undefined)changed=true;
+    return {name:String(x.name||''),type:x.type==='equipment'?'equipment':'scroll',quantity:Number.isFinite(q)?Math.max(1,Math.floor(q)):1};
+  });
+  return r;
+ });
+ if(changed){try{localStorage.setItem(LOOT_KEY,JSON.stringify(rows));}catch(_){}}
+ return rows;
+}
+function saveRecords(rows){try{localStorage.setItem(LOOT_KEY,JSON.stringify(rows));return true;}catch(_){alert('儲存失敗：瀏覽器儲存空間可能已滿。建議先匯出 CSV 備份。');return false;}}
+function statsFor(records){
+ let equipment=0,scroll=0,withEquipment=0,noLoot=0;const counts=new Map();
+ records.forEach(r=>{
+  let hadEquip=false;
+  if(r.noLoot||!(r.items||[]).length)noLoot++;
+  (r.items||[]).forEach(it=>{
+   const q=Number(it.quantity)||1;
+   if(it.type==='equipment'){equipment+=q;hadEquip=true;}else scroll+=q;
+   counts.set(it.name,(counts.get(it.name)||0)+q);
+  });
+  if(hadEquip)withEquipment++;
+ });
+ return {equipment,scroll,withEquipment,noLoot,counts,completed:records.length,pending:getPending().length};
+}
+function clearBoss(b){for(let ch=1;ch<=CHANNEL_COUNT;ch++)deleteStart(b,ch);if(b==='snowman')clearPending();}
+
+function channelView(b,start,now){
+ const boss=BOSSES[b],status=statusFor(b,start,now);
+ let detail=`<span class="muted">尚未開始計時</span>`,state='未記錄';
+ if(start){
+  const {min,max}=spawnAt(b,start);
+  if(status==='ready'){state='已到時間';detail=`<span class="text-ok">已到重生時間</span><small>最晚 ${formatClock(max)}</small>`;}
+  else if(status==='possible'){state='可能重生';detail=`<span class="text-gold">已可能重生</span><small>最晚 ${formatClock(max)}（${formatDuration(max-now)}）</small>`;}
+  else if(boss.minMinutes===boss.maxMinutes){state='倒數中';detail=`剩餘 ${formatDuration(max-now)}<small>預計 ${formatClock(max)}</small>`;}
+  else {state='倒數中';detail=`最早 ${formatDuration(min-now)}<small>最晚 ${formatDuration(max-now)}</small>`;}
+ }
+ return {detail,state,status};
+}
+function renderChannels(){
+ const b=currentBoss,boss=BOSSES[b],now=Date.now(),filter=$('channelSearch').value.trim(),activeOnly=$('activeOnly').checked;
+ $('channelsTitle').textContent=boss.icon+' '+boss.name;
+ $('spawnHint').textContent=boss.minMinutes===boss.maxMinutes?`固定 ${boss.minMinutes} 分鐘`:`${boss.minMinutes}～${boss.maxMinutes} 分鐘`;
+ let shown=0,html='';const pending=b==='snowman'&&lootEnabled()?new Set(getPending().map(x=>x.channel)):new Set();
+ for(let ch=1;ch<=CHANNEL_COUNT;ch++){
+  const start=getStart(b,ch);
+  if(filter&&String(ch).indexOf(filter)===-1)continue;
+  if(activeOnly&&!start)continue;
+  shown++;
+  const {detail,state,status}=channelView(b,start,now);
+  html+=`<article class="channel ${status}" data-ch="${ch}"><div class="channel-head"><b>CH ${pad(ch)}</b><span class="status">${state}</span></div><div class="channel-body">${detail}${pending.has(ch)?'<span class="pending-pill">待登記戰利品</span>':''}</div><div class="channel-actions">${start?`<button class="btn kill" data-action="kill" data-ch="${ch}">擊殺</button><button class="btn danger" data-action="clear" data-ch="${ch}">清除</button>`:`<button class="btn primary" data-action="start" data-ch="${ch}">開始計時</button>`}</div></article>`;
+ }
+ $('channelGrid').innerHTML=html||'<div class="empty">沒有符合條件的頻道。</div>';
+ $('displayCount').textContent=`顯示 ${shown} / 60 頻`;
+}
+function refreshChannelTimers(){
+ const b=currentBoss,now=Date.now();
+ document.querySelectorAll('#channelGrid .channel').forEach(card=>{
+  const ch=Number(card.dataset.ch),start=getStart(b,ch),{detail,state,status}=channelView(b,start,now);
+  const nextClass=`channel ${status}`;if(card.className!==nextClass)card.className=nextClass;
+  card.querySelector('.status').textContent=state;
+  const body=card.querySelector('.channel-body');
+  const pending=body.querySelector('.pending-pill');
+  const expected=detail+(pending?pending.outerHTML:'');
+  if(body.innerHTML!==expected)body.innerHTML=expected;
+ });
+}
+function renderQueue(){
+ const b=currentBoss,boss=BOSSES[b],now=Date.now(),rows=[];let running=0,possible=0,ready=0;
+ for(let ch=1;ch<=60;ch++){
+  const start=getStart(b,ch);if(!start)continue;const s=statusFor(b,start,now),t=spawnAt(b,start);
+  if(s==='running')running++;if(s==='possible')possible++;if(s==='ready')ready++;
+  rows.push({ch,status:s,min:t.min,max:t.max});
+ }
+ $('runningCount').textContent=running;$('possibleCount').textContent=possible;$('readyCount').textContent=ready;
+ // 已可重生排最前面，其餘依最早時間排序。
+ rows.sort((a,b)=>(a.status==='ready'?0:a.min)-(b.status==='ready'?0:b.min)||a.min-b.min);
+ $('queueList').innerHTML=rows.slice(0,QUEUE_LIMIT).map(r=>{
+  const fixed=boss.minMinutes===boss.maxMinutes;
+  const label=r.status==='ready'?'目前已到重生時間':r.status==='possible'?`可能已重生 · 最晚 ${formatClock(r.max)}`:fixed?`倒數 ${formatDuration(r.max-now)}`:`最早 ${formatDuration(r.min-now)}`;
+  const detail=fixed?`重生 ${formatClock(r.max)}`:`${formatClock(r.min)} ～ ${formatClock(r.max)}`;
+  return `<div class="queue-item"><div class="queue-top"><span>${boss.icon} ${boss.name}</span><span>CH ${pad(r.ch)}</span></div><div class="queue-time ${r.status==='ready'?'text-ok':r.status==='possible'?'text-gold':''}">${label}</div><div class="queue-detail">${detail}</div></div>`;
+ }).join('')||'<div class="empty">目前沒有計時中的頻道。</div>';
+}
+function renderKills(){const b=BOSSES[currentBoss];$('killCount').textContent=getKills(currentBoss);$('killLabel').textContent=`${b.icon} ${b.name}擊殺數`;}
+function setSidebarTab(tab){
+ if(tab==='loot'&&currentBoss!=='snowman')tab='respawn';
+ sidebarTab=tab;
+ const showLoot=tab==='loot';
+ $('respawnPane').hidden=showLoot;
+ $('lootPane').hidden=!showLoot;
+ ['respawn','loot'].forEach(name=>{
+  const el=$(name==='respawn'?'tabRespawn':'tabLoot');
+  const selected=name===tab;
+  el.classList.toggle('active',selected);
+  el.setAttribute('aria-selected',String(selected));
+ });
+ // 手機切換分頁時回到右側頂部。
+ if($('workspace').classList.contains('show-sidebar'))$('sidebar').scrollTop=0;
+}
+function renderSideTabs(){
+ const available=currentBoss==='snowman';
+ $('tabLoot').disabled=!available;
+ $('tabLoot').title=available?'查看雪毛怪人戰利品':'目前只支援雪毛怪人';
+ $('lootOnlyNote').hidden=available;
+ if(!available&&sidebarTab==='loot')sidebarTab='respawn';
+ const count=available&&lootEnabled()?getPending().length:0;
+ $('tabPendingCount').hidden=!count;
+ $('tabPendingCount').textContent=String(count);
+ setSidebarTab(sidebarTab);
+}
+
+function updatePendingOptions(){
+ const sel=$('lootChannelSelect'),current=sel.value,rows=getPending().sort((a,b)=>a.killedAt-b.killedAt);
+ const options=['<option value="">'+(rows.length?'選擇待登記頻道':'目前沒有待登記頻道')+'</option>'];
+ rows.forEach(r=>options.push(`<option value="${r.channel}">CH ${pad(r.channel)} · ${ago(r.killedAt)}擊殺（${formatClock(r.killedAt)}）</option>`));
+ sel.innerHTML=options.join('');
+ if(rows.some(r=>String(r.channel)===current))sel.value=current;
+ else if(rows.length===1)sel.value=String(rows[0].channel);
+ else sel.value='';
+ $('pendingInfo').textContent=`待登記：${rows.length} 筆${rows.length===1?'（已自動選取）':''}`;
+ $('mobilePending').textContent=lootEnabled()&&rows.length?`(${rows.length})`:'';
+}
+function renderLoot(){
+ const visible=currentBoss==='snowman';$('lootPanel').hidden=!visible;if(!visible)return;
+ const enabled=lootEnabled();
+ $('lootEnabled').checked=enabled;
+ $('lootSwitchHint').textContent=enabled?'開啟中：擊殺後可記錄掉落':'已關閉：只計擊殺，不用登記掉落';
+ $('lootDisabledNote').hidden=enabled;
+ $('lootEntryForm').hidden=!enabled;
+ updatePendingOptions();
+ const records=getRecords(),st=statsFor(records);
+ $('loggedRuns').textContent=st.completed;$('pendingRuns').textContent=st.pending;$('equipmentCount').textContent=st.equipment;$('scrollCount').textContent=st.scroll;
+ const rate=st.completed?(100*st.withEquipment/st.completed).toFixed(1)+'%':'—';
+ const avg=st.equipment?(st.completed/st.equipment).toFixed(1):'—';
+ $('lootInsights').innerHTML=`有掉裝備紀錄：<strong>${st.withEquipment} / ${st.completed} 筆</strong>（<strong>${rate}</strong>）<br>平均每 <strong>${avg}</strong> 次已登記擊殺取得 1 件裝備。<br>無掉落紀錄：${st.noLoot} 筆；累積擊殺計數：${getKills('snowman')}。<br><small>※ 掉落比例以「已完成戰利品紀錄」為分母，是個人觀察值，不代表遊戲官方掉率。舊資料或重置擊殺數可能造成總擊殺與登記筆數不同。</small>`;
+ const counts=[...st.counts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'zh-Hant'));
+ $('lootCounts').innerHTML=counts.map(([name,n])=>`<div class="loot-count"><span>${htmlSafe(name)}</span><b>×${n}</b></div>`).join('')||'<div class="empty">目前沒有掉落品項。</div>';
+ $('historyCount').textContent=`（${records.length} 筆）`;
+ const visibleRecords=showAllLoot?records:records.slice(0,10);
+ $('lootHistory').innerHTML=visibleRecords.map(r=>{
+  const summary=r.noLoot?'無值得記錄掉落':r.items.map(it=>`${htmlSafe(it.name)} ×${it.quantity||1}`).join('、');
+  return `<div class="history-item" data-id="${htmlSafe(r.id)}"><div class="row"><b>CH ${pad(Number(r.channel)||0)}</b><small class="muted">${formatDate(Number(r.recordedAt)||Date.now())}</small></div><p>${summary}</p><div class="history-actions"><button class="btn small" data-loot-action="edit" data-id="${htmlSafe(r.id)}">編輯</button><button class="btn small danger" data-loot-action="delete" data-id="${htmlSafe(r.id)}">刪除</button></div></div>`;
+ }).join('')||'<div class="empty">尚無掉落紀錄。</div>';
+ $('showMoreHistory').hidden=records.length<=10;
+ $('showMoreHistory').textContent=showAllLoot?'收起紀錄':`顯示全部 ${records.length} 筆紀錄`;
+}
+function renderAll(){renderChannels();renderQueue();renderKills();renderLoot();renderSideTabs();}
+function activateBoss(b){currentBoss=b;document.querySelectorAll('[data-boss]').forEach(el=>el.classList.toggle('active',el.dataset.boss===b));$('channelSearch').value='';$('activeOnly').checked=false;renderAll();}
+function setMobileView(panel){$('workspace').classList.toggle('show-sidebar',panel==='stats');$('mobileChannels').classList.toggle('primary',panel==='channels');$('mobileStats').classList.toggle('primary',panel==='stats');window.scrollTo({top:0,behavior:'instant'});}
+
+function onStart(ch){if(getStart(currentBoss,ch))return;setStart(currentBoss,ch);renderAll();toast(`CH ${pad(ch)} 已開始計時（擊殺數不變）`);}
+function onKill(ch){
+ const b=currentBoss;
+ if(b==='snowman'&&lootEnabled()&&hasPending(ch)){
+  const pending=getPending().find(x=>x.channel===ch);
+  alert(`CH ${pad(ch)} 上次擊殺（${formatClock(pending.killedAt)}）尚未登記戰利品。\n\n請先到右側「戰利品紀錄」分頁完成紀錄或選「無值得記錄掉落」。\n這次不會增加擊殺數，也不會重置時間。`);
+  $('lootChannelSelect').value=String(ch);
+  setSidebarTab('loot');
+  if(window.innerWidth<=950)setMobileView('stats');
+  return;
+ }
+ const t=Date.now();setStart(b,ch,t);incrementKills(b);
+ if(b==='snowman'&&lootEnabled())addPending(ch,t);
+ renderAll();toast(`${BOSSES[b].name} CH ${pad(ch)} 擊殺 +1，已重設倒數`);
+}
+function onClear(ch){
+ if(currentBoss==='snowman'&&lootEnabled()&&hasPending(ch)){
+  if(!confirm(`CH ${pad(ch)} 尚有未登記戰利品，清除計時會同時放棄這筆待登記狀態。確定清除？`))return;
+  removePending(ch);
+ }
+ deleteStart(currentBoss,ch);renderAll();
+}
+
+function openLootDialog(ch,{editId=null}={}){
+ if(!editId&&!lootEnabled()){toast('請先啟用戰利品紀錄');return;}
+ const pending=getPending();
+ const record=editId?getRecords().find(r=>r.id===editId):null;
+ if(editId&&!record){alert('找不到這筆戰利品紀錄。');return;}
+ if(!editId&&!pending.some(r=>r.channel===ch)){alert('此頻道目前沒有待登記戰利品。');renderAll();return;}
+ modalMode=editId?'edit':'new';modalChannel=ch;editingRecordId=editId;
+ $('lootTitle').textContent=`☃️ 雪毛怪人 CH ${pad(ch)} ${editId?'編輯戰利品':'記錄戰利品'}`;
+ $('lootDialogHelp').textContent=editId?'修改品項與數量後儲存；不會變動擊殺數或倒數。':'一次可選多樣裝備與卷軸，若同品項掉多個可以調整數量。';
+ $('lootSearch').value='';
+ const existing=new Map((record?.items||[]).map(x=>[x.name,Number(x.quantity)||1]));
+ let html='';
+ [['equipment','⚔️ 裝備'],['scrolls','📜 卷軸']].forEach(([group,title])=>{
+  html+=`<div class="option-head">${title}</div>`;
+  SNOWMAN_LOOT[group].forEach(name=>{
+   const q=existing.get(name)||1,checked=existing.has(name);
+   html+=`<label class="option" data-search="${htmlSafe(name)}"><input type="checkbox" class="loot-check" data-type="${group==='equipment'?'equipment':'scroll'}" value="${htmlSafe(name)}" ${checked?'checked':''}><span>${htmlSafe(name)}</span><input type="number" class="loot-qty" value="${q}" min="1" max="99" inputmode="numeric" aria-label="${htmlSafe(name)} 數量" ${checked?'':'disabled'}></label>`;
+  });
+ });
+ $('lootOptions').innerHTML=html;
+ $('lootBackdrop').classList.add('open');document.body.style.overflow='hidden';$('lootSearch').focus();
+}
+function closeLootDialog(){modalChannel=null;editingRecordId=null;$('lootBackdrop').classList.remove('open');document.body.style.overflow='';}
+function collectLoot(){
+ const items=[];
+ $('lootOptions').querySelectorAll('.option').forEach(label=>{
+  const checkbox=label.querySelector('.loot-check');if(!checkbox.checked)return;
+  const input=label.querySelector('.loot-qty'),q=Number(input.value);
+  if(!Number.isInteger(q)||q<1||q>99)throw new Error(`${checkbox.value} 的數量必須在 1～99 之間。`);
+  items.push({name:checkbox.value,type:checkbox.dataset.type,quantity:q});
+ });
+ return items;
+}
+function commitLoot(items,none=false){
+ if(modalChannel===null)return;
+ const rows=getRecords(),id=editingRecordId;
+ if(modalMode==='edit'){
+  const found=rows.find(r=>r.id===id);if(!found)return;
+  found.items=items;found.noLoot=none;
+ }else{
+  if(!hasPending(modalChannel)){alert('此頻道已不在待登記清單，請重新整理後確認。');return;}
+  const pending=getPending().find(r=>r.channel===modalChannel);
+  rows.unshift({id:randomId(),channel:modalChannel,killedAt:pending.killedAt,items,noLoot:none,recordedAt:Date.now()});
+ }
+ if(!saveRecords(rows))return;
+ if(modalMode==='new')removePending(modalChannel);
+ closeLootDialog();$('lootChannelSelect').value='';renderAll();toast(id?'已更新戰利品紀錄':'已儲存戰利品，頻道已從待登記清單移除');
+}
+
+function exportTimerText(){
+ const b=currentBoss,boss=BOSSES[b],lines=['【王重生時間】',`匯出時間：${formatDate(Date.now())}`,'',`${boss.icon} ${boss.name}`];let count=0;
+ for(let ch=1;ch<=60;ch++){
+  const start=getStart(b,ch);if(!start)continue;const t=spawnAt(b,start);
+  lines.push(`CH${pad(ch)} ${formatDate(t.min)}${t.min===t.max?'':` ~ ${formatDate(t.max)}`}`);count++;
+ }
+ if(!count)lines.push('目前沒有計時中的頻道。');return lines.join('\n');
+}
+function parseTimestamp(text){
+ const m=text.match(/^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);if(!m)return null;
+ const [yr,mo,d,hr,mi,s]=m.slice(1).map(Number),obj=new Date(yr,mo-1,d,hr,mi,s);
+ if(obj.getFullYear()!==yr||obj.getMonth()!==mo-1||obj.getDate()!==d||obj.getHours()!==hr||obj.getMinutes()!==mi||obj.getSeconds()!==s)return null;
+ return obj.getTime();
+}
+function importTimerText(text){
+ let b=null;const parsed=new Map();
+ for(const line of text.split(/\r?\n/).map(x=>x.trim())){
+  const boss=Object.entries(BOSSES).find(([k,v])=>line.includes(v.name)&&!line.startsWith('CH'));
+  if(boss){b=boss[0];continue;}
+  const match=line.match(/^CH(\d{1,2})\s+(.+)$/i);if(!b||!match)continue;
+  const ch=Number(match[1]);if(ch<1||ch>60)continue;
+  const times=match[2].split(/\s+~\s+/),min=parseTimestamp(times[0]);if(min===null)continue;
+  const bossSpec=BOSSES[b],max=times[1]?parseTimestamp(times[1]):min;
+  if(max===null||max-min!==(bossSpec.maxMinutes-bossSpec.minMinutes)*60000)continue;
+  const start=min-bossSpec.minMinutes*60000;if(start<=0)continue;
+  parsed.set(b+':'+ch,{b,ch,start});
+ }
+ if(!parsed.size)throw new Error('沒有找到有效的頻道時間；請直接貼上本站匯出的文字。');
+ parsed.forEach(({b,ch,start})=>setStart(b,ch,start));return parsed.size;
+}
+function exportLootText(){
+ const rows=getRecords(),s=statsFor(rows);
+ const lines=['【雪毛怪人戰利品統計】',`匯出時間：${formatDate(Date.now())}`,`擊殺計數：${getKills('snowman')}`,`已完成紀錄：${s.completed}`,`待記錄：${s.pending}`,`裝備：${s.equipment} 件`, `卷軸：${s.scroll} 張`,`有裝備紀錄：${s.withEquipment} 筆`, `有裝備比例（已紀錄為分母）：${s.completed?(s.withEquipment/s.completed*100).toFixed(1)+'%':'—'}`,'', '【累計品項】'];
+ [...s.counts].sort((a,b)=>b[1]-a[1]).forEach(([n,c])=>lines.push(`${n} ×${c}`));
+ if(!s.counts.size)lines.push('尚未記錄任何掉落品項');return lines.join('\n');
+}
+function csvCell(v){return '"'+String(v===undefined||v===null?'':v).replace(/"/g,'""')+'"';}
+function exportLootCSV(){
+ const rows=[['紀錄ID','記錄時間','擊殺時間','頻道','種類','戰利品','數量','無值得記錄掉落']];
+ getRecords().forEach(r=>{
+  const base=[r.id,formatDate(r.recordedAt),r.killedAt?formatDate(r.killedAt):'',`CH${pad(Number(r.channel)||0)}`];
+  if(!r.items.length)rows.push([...base,'','','',r.noLoot?'是':'否']);
+  else r.items.forEach(it=>rows.push([...base,it.type==='equipment'?'裝備':'卷軸',it.name,it.quantity||1,'否']));
+ });
+ const csv='\uFEFF'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+ const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');
+ a.href=url;a.download=`snowman_loot_${formatDate(Date.now()).replace(/[^0-9]/g,'').slice(0,14)}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function openTextDialog(mode,text=''){
+ textMode=mode;$('textBackdrop').classList.add('open');document.body.style.overflow='hidden';
+ $('textTitle').textContent=mode==='import'?'匯入重生時間':mode==='loot'?'戰利品統計文字':'分享重生時間';
+ $('textHelp').textContent=mode==='import'?'貼上別人分享的純文字時間表，不會清掉你其他頻道。':'可直接複製貼到 LINE 或 Discord。';
+ $('shareText').value=text;$('shareText').readOnly=mode!=='import';$('confirmText').textContent=mode==='import'?'確認匯入':'複製文字';$('shareText').focus();
+ if(mode!=='import')$('shareText').select();
+}
+function closeTextDialog(){$('textBackdrop').classList.remove('open');document.body.style.overflow='';}
+async function copyText(str){
+ try{await navigator.clipboard.writeText(str);return true;}catch(_){
+  $('shareText').focus();$('shareText').select();return document.execCommand('copy');
+ }
+}
+
+$('bossTabs').addEventListener('click',e=>{const el=e.target.closest('[data-boss]');if(el)activateBoss(el.dataset.boss);});
+$('channelGrid').addEventListener('click',e=>{const btn=e.target.closest('button[data-action]');if(!btn)return;const ch=Number(btn.dataset.ch);if(btn.dataset.action==='start')onStart(ch);if(btn.dataset.action==='kill')onKill(ch);if(btn.dataset.action==='clear')onClear(ch);});
+$('channelSearch').addEventListener('input',renderChannels);$('activeOnly').addEventListener('change',renderChannels);
+$('clearBoss').addEventListener('click',()=>{if(confirm(`確定清除 ${BOSSES[currentBoss].name} 所有頻道計時？\n不會清除擊殺數與已儲存的戰利品。`)){clearBoss(currentBoss);renderAll();}});
+$('clearAll').addEventListener('click',()=>{if(confirm('確定清除全部三種王的倒數時間？\n不會清除擊殺數與已儲存戰利品，但會移除待登記戰利品。')){Object.keys(BOSSES).forEach(clearBoss);renderAll();}});
+$('resetKills').addEventListener('click',()=>{if(confirm(`確定將 ${BOSSES[currentBoss].name} 擊殺數歸零？\n戰利品紀錄仍會保留。`)){localStorage.removeItem(killKey(currentBoss));renderAll();}});
+$('mobileChannels').addEventListener('click',()=>setMobileView('channels'));$('mobileStats').addEventListener('click',()=>setMobileView('stats'));
+$('tabRespawn').addEventListener('click',()=>setSidebarTab('respawn'));
+$('tabLoot').addEventListener('click',()=>setSidebarTab('loot'));
+$('lootEnabled').addEventListener('change',e=>setLootEnabled(e.target.checked));
+$('openLoot').addEventListener('click',()=>{const ch=Number($('lootChannelSelect').value);if(!ch){toast('請先選擇待登記的頻道');return;}openLootDialog(ch);});
+$('lootSearch').addEventListener('input',()=>{const q=$('lootSearch').value.trim().toLowerCase();$('lootOptions').querySelectorAll('.option').forEach(el=>el.hidden=!el.dataset.search.toLowerCase().includes(q));});
+$('lootOptions').addEventListener('change',e=>{if(!e.target.matches('.loot-check'))return;const qty=e.target.closest('.option').querySelector('.loot-qty');qty.disabled=!e.target.checked;});
+$('saveLoot').addEventListener('click',()=>{try{const items=collectLoot();if(!items.length){alert('請勾選至少一個品項；若沒有裝備／卷軸，請按「無值得記錄掉落」。');return;}commitLoot(items,false);}catch(err){alert(err.message);}});
+$('noLoot').addEventListener('click',()=>{if(modalMode==='edit'&&!confirm('這會把此筆紀錄改成「無值得記錄掉落」，確定嗎？'))return;commitLoot([],true);});
+$('cancelLoot').addEventListener('click',closeLootDialog);$('lootBackdrop').addEventListener('click',e=>{if(e.target===$('lootBackdrop'))closeLootDialog();});
+$('lootHistory').addEventListener('click',e=>{
+ const btn=e.target.closest('button[data-loot-action]');if(!btn)return;
+ const id=btn.dataset.id,rows=getRecords(),record=rows.find(r=>r.id===id);if(!record)return;
+ if(btn.dataset.lootAction==='edit')openLootDialog(Number(record.channel),{editId:id});
+ if(btn.dataset.lootAction==='delete'&&confirm(`確定刪除 CH ${pad(Number(record.channel))} 在 ${formatDate(record.recordedAt)} 的戰利品紀錄？\n此動作不會改動擊殺數與計時。`)){const next=rows.filter(r=>r.id!==id);if(saveRecords(next))renderAll();}
+});
+$('showMoreHistory').addEventListener('click',()=>{showAllLoot=!showAllLoot;renderLoot();});
+$('exportLootText').addEventListener('click',()=>openTextDialog('loot',exportLootText()));
+$('exportLootCSV').addEventListener('click',exportLootCSV);
+$('clearLoot').addEventListener('click',()=>{if(confirm('確定刪除全部雪毛怪人「已儲存」的戰利品紀錄？\n此操作無法復原，建議先匯出 CSV。')){if(saveRecords([])){showAllLoot=false;renderAll();}}});
+$('exportTimers').addEventListener('click',()=>openTextDialog('export',exportTimerText()));$('importTimers').addEventListener('click',()=>openTextDialog('import'));
+$('cancelText').addEventListener('click',closeTextDialog);$('textBackdrop').addEventListener('click',e=>{if(e.target===$('textBackdrop'))closeTextDialog();});
+$('confirmText').addEventListener('click',async()=>{
+ if(textMode==='import'){
+  try{const n=importTimerText($('shareText').value);closeTextDialog();renderAll();toast(`成功匯入 ${n} 個頻道`);}catch(e){alert(e.message);}
+ }else if(await copyText($('shareText').value)){toast('已複製到剪貼簿');closeTextDialog();}else alert('複製未成功，請手動選取文字複製。');
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('lootBackdrop').classList.contains('open'))closeLootDialog();else if($('textBackdrop').classList.contains('open'))closeTextDialog();}});
+window.addEventListener('storage',e=>{if(e.key&&e.key.startsWith('bossTimer:'))renderAll();});
+// 只刷新倒數與排序；不在每秒重建下拉選單，避免使用者的選取被改掉。
+setInterval(()=>{if(!$('lootBackdrop').classList.contains('open')){refreshChannelTimers();renderQueue();}},1000);
+setInterval(()=>{if(currentBoss==='snowman'&&!$('lootBackdrop').classList.contains('open'))updatePendingOptions();},30000);
+renderAll();
+</script>
+</body>
+</html>
